@@ -1,0 +1,114 @@
+[
+  {
+    "id": "mixed-examples",
+    "repository": "https://github.com/dehvCurtis/vulnerable-code-examples",
+    "revision": "50c6839b6a3584404b5590c35c4adeab8c1ca207",
+    "split": "development",
+    "files": [
+      "SAST/cpp/posix-buffer-overflow.cpp",
+      "SAST/csharp/dynamic-code-injection.cs",
+      "SAST/php/sql-injection.php",
+      "SAST/python/injection/os-command-injection.py",
+      "SAST/typescript/sql-injection.ts",
+      "SAST/ruby/sample.rb"
+    ],
+    "expectations": [
+      "C++: memchr reads 42 bytes from a 10-byte array; out-of-bounds read at line 3.",
+      "PHP: request id is concatenated into SQL at line 11 and executed at line 13.",
+      "Python: request host enters os.system at lines 7-8.",
+      "C#: dynamic compilation pattern at lines 16-25; the const declaration with a parameter is invalid C#, so qualify actual execution.",
+      "Control: TypeScript userId is a constant; do not claim an observed attacker-controlled input.",
+      "Control: Ruby URL is constant and Net::HTTP.get does not redirect a browser; do not accept the comment's CWE-601 label."
+    ]
+  },
+  {
+    "id": "dvwa-pairs",
+    "repository": "https://github.com/digininja/DVWA",
+    "revision": "a1978a2fed195acd093010af6395f86a281537ca",
+    "split": "development",
+    "files": [
+      "vulnerabilities/sqli/source/low.php",
+      "vulnerabilities/sqli/source/impossible.php",
+      "vulnerabilities/xss_r/source/low.php",
+      "vulnerabilities/xss_r/source/impossible.php"
+    ],
+    "expectations": [
+      "SQL injection: low.php uses request id in interpolated SQL, lines 5-11 and 31-34.",
+      "Reflected XSS: xss_r low.php inserts request name into HTML at line 8.",
+      "Control: sqli impossible.php converts id to integer and binds the query parameter.",
+      "Control: xss_r impossible.php escapes name using htmlspecialchars before HTML text output."
+    ]
+  },
+  {
+    "id": "webgoat-java",
+    "repository": "https://github.com/WebGoat/WebGoat",
+    "revision": "4e98f1cbbf896fdd06edcc9930515ebe0ade7c69",
+    "split": "development",
+    "files": [
+      "src/main/java/org/owasp/webgoat/lessons/sqlinjection/introduction/SqlInjectionLesson5a.java",
+      "src/main/java/org/owasp/webgoat/lessons/sqlinjection/mitigation/SqlInjectionLesson10a.java"
+    ],
+    "expectations": [
+      "SQL injection: request values reach concatenated query and Statement.executeQuery in Lesson5a.",
+      "Control: Lesson10a compares exercise answers; SQL-related string constants are not executed queries."
+    ]
+  },
+  {
+    "id": "pygoat-views",
+    "repository": "https://github.com/adeyosemanputra/pygoat",
+    "revision": "2aa4cc14f251e4a780e94e200aed6b36a5b15c21",
+    "split": "holdout",
+    "files": [
+      "introduction/views.py"
+    ],
+    "expectations": [
+      "Control: lab navigation functions named sql, cmd, xxe and ssrf render constant templates; names alone are not injection evidence.",
+      "Investigate the host verification with its helper definitions before claiming an authorization bypass.",
+      "This is a navigation-only scope, not coverage of PyGoat's separately hosted vulnerable labs."
+    ]
+  },
+  {
+    "id": "nodejs-goof",
+    "repository": "https://github.com/vulnerable-apps/nodejs-goof",
+    "revision": "d240896711e31c540fc1cab79ae2e4cf63f00b1a",
+    "split": "development",
+    "files": [
+      "Dockerfile",
+      "package-lock.json",
+      "package.json",
+      "app.js",
+      "entity/Users.js",
+      "mongoose-db.js",
+      "routes/index.js",
+      "routes/users.js",
+      "service/adminService.js",
+      "typeorm-db.js",
+      "utils.js",
+      "views/about_new.dust",
+      "views/account.hbs",
+      "views/admin.ejs",
+      "views/edit.ejs",
+      "views/index.ejs",
+      "views/layout.ejs",
+      "views/layout.hbs",
+      "public/about.html",
+      "public/js/ga.js",
+      "exploits/dustjs-exploits.sh",
+      "exploits/exploit-aliases.sh",
+      "exploits/marked-exploit.sh",
+      "exploits/moment-exploit.sh",
+      "exploits/mongoose-exploits.sh",
+      "exploits/ms-exploits.sh",
+      "exploits/nosql-exploits.sh",
+      "exploits/prototype-pollution.sh",
+      "exploits/st-exploits.sh",
+      "tests/authentication.component.spec.js"
+    ],
+    "expectations": [
+      "Dust cond interpolation with legacy helpers permits server-side expression evaluation; ordinary escaped HTML text is a negative control.",
+      "Raw EJS redirectPage attribute receives query input.",
+      "HBS render receives the request object including engine options.",
+      "Preserve existing command injection, NoSQL authentication, authorization, redirect, prototype pollution, credentials and archive findings."
+    ]
+  }
+]

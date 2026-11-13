@@ -1,0 +1,116 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Trace: API (demo)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/server/server/main.js",
+      "cwd": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/dist/server/**/*.js"
+      ],
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development",
+        "HOST": "127.0.0.1",
+        "PORT": "4311",
+        "TRACE_PUBLIC_ORIGIN": "http://127.0.0.1:5174",
+        "TRACE_AI_PROVIDER": "disabled",
+        "DATABASE_URL": "postgres://trace:trace-local@127.0.0.1:54329/trace",
+        "TRACE_TOKEN": null,
+        "CHATGPT_API_KEY_OX_CHALLENGE": null,
+        "OPENAI_API_KEY": null
+      }
+    },
+    {
+      "name": "Trace: Worker (demo)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/dist/server/server/worker-main.js",
+      "cwd": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/dist/server/**/*.js"
+      ],
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development",
+        "TRACE_AI_PROVIDER": "disabled",
+        "TRACE_WORKER_CONCURRENCY": "1",
+        "TRACE_WORKER_HEALTH_FILE": null,
+        "DATABASE_URL": "postgres://trace:trace-local@127.0.0.1:54329/trace",
+        "CHATGPT_API_KEY_OX_CHALLENGE": null,
+        "OPENAI_API_KEY": null
+      }
+    },
+    {
+      "name": "Trace: Vite + browser",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vite/bin/vite.js",
+      "args": [
+        "--port",
+        "5174"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "env": {
+        "PORT": "4311",
+        "NO_COLOR": "1",
+        "CHATGPT_API_KEY_OX_CHALLENGE": null,
+        "OPENAI_API_KEY": null
+      },
+      "serverReadyAction": {
+        "pattern": "Local:\\s+(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "debugWithEdge",
+        "webRoot": "${workspaceFolder}",
+        "killOnServerStop": true
+      }
+    },
+    {
+      "name": "Trace: Current test file",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "TRACE_AI_PROVIDER": "disabled",
+        "DATABASE_URL": "postgres://trace:trace-local@127.0.0.1:54329/trace",
+        "CHATGPT_API_KEY_OX_CHALLENGE": null,
+        "OPENAI_API_KEY": null
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Trace: Full stack (demo)",
+      "configurations": [
+        "Trace: API (demo)",
+        "Trace: Worker (demo)",
+        "Trace: Vite + browser"
+      ],
+      "preLaunchTask": "Trace: Build server for debugging",
+      "stopAll": true
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+import type { Inventory, Intelligence } from './intelligence-types.js';
+export type Status = 'queued' | 'running' | 'completed' | 'partial' | 'failed';
+export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'unknown';
+export type SourceFile = { path: string; content: string; sha256: string };
+export type Snapshot = {
+  repository: string;
+  revision: string;
+  files: SourceFile[];
+  warnings: string[];
+  acquiredAt: string;
+  fixture: boolean;
+  continuation?: { parentScanId: string; packageOffset: number };
+};
+export type Evidence = {
+  path: string;
+  line: number;
+  endLine: number;
+  column?: number;
+  endColumn?: number;
+  snippet: string;
+  sha256: string;
+  url?: string;
+};
+export type Finding = {
+  id: string;
+  title: string;
+  severity: Severity;
+  category: 'code' | 'dependency' | 'emerging';
+  rule: string;
+  detector: string;
+  confidence: 'high' | 'medium';
+  assurance: 'potential' | 'detected';
+  summary: string;
+  rationale: string;
+  evidence: Evidence;
+  path: { label: string; detail: string; line?: number; evidence?: Evidence }[];
+  prerequisites: string[];
+  limitations: string[];
+  remediation: string;
+  references: { title: string; url: string }[];
+  package?: {
+    name: string;
+    version: string;
+    advisory: string;
+    ecosystem?: string;
+    fixedVersions?: string[];
+  };
+  intelligence?: Intelligence;
+  routeContext?: {
+    method: string;
+    route: string;
+    middleware: string[];
+    registration: Evidence;
+    sessionChecks: Evidence[];
+  }[];
+};
+export type AnalyzerResult = {
+  status: 'complete' | 'partial' | 'failed' | 'skipped';
+  detail: string;
+  findings: Finding[];
+  durationMs: number;
+  version: string;
+  checkedAt?: string;
+  packageCoverage?: {
+    checked: number;
+    total: number;
+    nextOffset?: number;
+    issues?: string[];
+    batchCompleted?: boolean;
+  };
+  sourceRejections?: { findingId: string; title: string; reason: string; evidence: Evidence }[];
+  assessments?: { title: string; reason: string; sources: { title: string; url: string }[] }[];
+};
+export type Scan = {
+  id: string;
+  repository: string;
+  mode: 'live' | 'demo';
+  status: Status;
+  phase: string;
+  activeAnalyzer?: 'source' | 'dependencies' | 'research';
+  attempt: number;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+  retryOf?: string;
+  error?: string;
+  snapshot?: Omit<Snapshot, 'files'> & { fileCount: number };
+  analyzers: { source?: AnalyzerResult; dependencies?: AnalyzerResult; research?: AnalyzerResult };
+  inventory?: Inventory;
+  events: { at: string; message: string }[];
+};

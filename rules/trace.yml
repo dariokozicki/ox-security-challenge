@@ -1,0 +1,47 @@
+rules:
+  - id: trace.command-injection
+    languages: [javascript, typescript]
+    mode: taint
+    message: Request-controlled data reaches a shell command.
+    severity: ERROR
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.params.$KEY
+    pattern-sinks:
+      - patterns:
+          - pattern-either:
+              - pattern: exec($CMD, ...)
+              - pattern: execSync($CMD, ...)
+              - pattern: $CP.exec($CMD, ...)
+              - pattern: $CP.execSync($CMD, ...)
+          - focus-metavariable: $CMD
+  - id: trace.sql-injection
+    languages: [javascript, typescript]
+    mode: taint
+    message: Request-controlled data reaches the SQL text argument.
+    severity: ERROR
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.params.$KEY
+    pattern-sinks:
+      - patterns:
+          - pattern: $DB.query($SQL, ...)
+          - focus-metavariable: $SQL
+  - id: trace.reflected-xss
+    languages: [javascript, typescript]
+    mode: taint
+    message: Request-controlled data reaches an HTML response.
+    severity: WARNING
+    pattern-sources:
+      - pattern-either:
+          - pattern: $REQ.query.$KEY
+          - pattern: $REQ.body.$KEY
+          - pattern: $REQ.params.$KEY
+    pattern-sinks:
+      - patterns:
+          - pattern: $RES.send($HTML)
+          - focus-metavariable: $HTML

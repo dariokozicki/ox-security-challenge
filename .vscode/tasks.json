@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Trace: Build server for debugging",
+      "type": "process",
+      "command": "node",
+      "args": ["node_modules/typescript/bin/tsc", "-p", "tsconfig.server.json"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": "$tsc"
+    }
+  ]
+}

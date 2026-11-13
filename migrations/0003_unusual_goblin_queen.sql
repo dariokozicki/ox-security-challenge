@@ -1,0 +1,1 @@
+ALTER TABLE "snapshot_objects" ADD COLUMN "generation" text;

@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: trace
+      POSTGRES_PASSWORD: trace-local
+      POSTGRES_DB: trace
+    ports: ["127.0.0.1:54329:5432"]
+    volumes:
+      - trace-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U trace -d trace]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  migrate:
+    build: .
+    image: trace:local
+    command: [node, dist/server/server/db/migrate-main.js]
+    volumes: ["trace-snapshots:/var/lib/trace/snapshots"]
+    environment:
+      DATABASE_URL: postgres://trace:trace-local@postgres:5432/trace
+      TRACE_SNAPSHOT_DIR: /var/lib/trace/snapshots
+    depends_on:
+      postgres: { condition: service_healthy }
+  api:
+    image: trace:local
+    init: true
+    environment:
+      DATABASE_URL: postgres://trace:trace-local@postgres:5432/trace
+      TRACE_SNAPSHOT_DIR: /var/lib/trace/snapshots
+      TRACE_TOKEN: ${TRACE_TOKEN:?Set a 32-character local access token}
+      TRACE_PUBLIC_ORIGIN: ${TRACE_PUBLIC_ORIGIN:-http://localhost:4310}
+    volumes: ["trace-snapshots:/var/lib/trace/snapshots"]
+    ports: ["127.0.0.1:${TRACE_HTTP_PORT:-4310}:4310"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4310/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+  worker:
+    image: trace:local
+    init: true
+    command: [node, dist/server/server/worker-main.js]
+    environment:
+      DATABASE_URL: postgres://trace:trace-local@postgres:5432/trace
+      TRACE_SNAPSHOT_DIR: /var/lib/trace/snapshots
+      TRACE_AI_PROVIDER: disabled
+      TRACE_WORKER_CONCURRENCY: 2
+      TRACE_WORKER_HEALTH_FILE: /tmp/trace-worker-health
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: [CMD, node, scripts/worker-health.mjs]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    volumes: ["trace-snapshots:/var/lib/trace/snapshots"]
+    stop_grace_period: 120s
+    restart: unless-stopped
+volumes:
+  trace-postgres:
+  trace-snapshots:
